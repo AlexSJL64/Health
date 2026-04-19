@@ -849,49 +849,37 @@ input,textarea,select{ font-family:var(--f-sans); outline:none; }
      Cliquez dessus pour l'ouvrir/fermer
      ═══════════════════════════════════════ -->
 
+<!-- Languette toujours visible sur le bord droit -->
+
 <div id="pink-postit-btn" onclick="togglePinkPostit()"
   style="position:fixed;right:0;top:50%;transform:translateY(-50%);
     background:#fce4ec;border:1px solid #f48fb1;border-right:none;
-    border-radius:12px 0 0 12px;padding:10px 8px;cursor:pointer;
+    border-radius:12px 0 0 12px;padding:12px 8px;cursor:pointer;
     writing-mode:vertical-rl;font-family:var(--f-mono);font-size:11px;
     color:#c2185b;letter-spacing:.1em;text-transform:uppercase;
-    box-shadow:-3px 0 12px rgba(0,0,0,.2);z-index:50;
-    transition:all .2s">
+    box-shadow:-3px 0 16px rgba(0,0,0,.35);z-index:9999;">
   📝 Notes
 </div>
 
-<!-- Post-it rose expansible -->
+<!-- Panneau rose expansible -->
 
 <div id="pink-postit"
   style="position:fixed;right:0;top:50%;transform:translateY(-50%);
-    width:280px;background:#fce4ec;border:1px solid #f48fb1;border-right:none;
+    width:290px;background:#fce4ec;border:1px solid #f48fb1;border-right:none;
     border-radius:16px 0 0 16px;padding:20px;
-    box-shadow:-4px 0 24px rgba(0,0,0,.3);z-index:51;
-    display:none;flex-direction:column;gap:10px">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-    <div style="font-family:var(--f-mono);font-size:11px;font-weight:700;color:#880e4f;text-transform:uppercase;letter-spacing:.12em">📝 Notes rapides</div>
-    <button onclick="togglePinkPostit()" style="background:none;border:none;color:#c2185b;font-size:18px;cursor:pointer;line-height:1">×</button>
+    box-shadow:-4px 0 28px rgba(0,0,0,.4);z-index:9999;
+    display:none;flex-direction:column;gap:10px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+    <div style="font-family:var(--f-mono);font-size:11px;font-weight:700;color:#880e4f;text-transform:uppercase;letter-spacing:.12em;">📝 Notes rapides</div>
+    <button onclick="togglePinkPostit()" style="background:none;border:none;color:#c2185b;font-size:20px;cursor:pointer;line-height:1;">×</button>
   </div>
-  <!-- Zone de texte libre du post-it rose -->
-  <textarea
-    id="pink-notes"
-    oninput="savePinkNotes()"
-    style="background:rgba(255,255,255,0.6);border:1px solid #f48fb1;border-radius:8px;
-      padding:10px;color:#3e0018;font-size:14px;resize:none;min-height:200px;
-      line-height:1.7;font-family:var(--f-sans)"
-    placeholder="Notes rapides…
-— À faire aujourd'hui
-— Questions pour le DIM
-— Idée de projet
-— Mot de vocabulaire data
-…"
-  ></textarea>
-  <div style="font-family:var(--f-mono);font-size:10px;color:#c2185b;text-align:right">
-    Sauvegarde automatique ✓
-  </div>
+  <textarea id="pink-notes" oninput="savePinkNotes()"
+    style="background:rgba(255,255,255,0.65);border:1px solid #f48fb1;border-radius:8px;
+      padding:10px;color:#3e0018;font-size:14px;resize:none;min-height:220px;
+      line-height:1.75;font-family:var(--f-sans);"
+    placeholder="Notes rapides…&#10;— À faire aujourd'hui&#10;— Question pour le DIM&#10;— Idée de projet"></textarea>
+  <div style="font-family:var(--f-mono);font-size:10px;color:#c2185b;text-align:right;">Sauvegarde auto ✓</div>
 </div>
-
-</div><!-- fin .shell -->
 
 <!-- ═══════════════════════════════════
      MODALE : Ajouter un bloc planning
@@ -970,7 +958,6 @@ function today() { return new Date().toISOString().split('T')[0]; }
 // ════════════════════════════════════════════════════════
 const BLOCS = [
   // ── BLOC 1 : FONDATIONS DATA ────────────────────────────
-  // Modifié : Google Data Analytics en premier (14 avril) + Harvard CS50
   { id:'b1', num:'B1', name:'Fondations · Data & Culture Numérique', color:'#3d9bff',
     formations:[
       { id:'goog-da', title:'Google Data Analytics Certificate',
@@ -979,10 +966,28 @@ const BLOCS = [
         applyDate:'Inscription immédiate', applyUrgent:true,
         start:'14 avril 2026', end:'octobre 2026',
         hours:180, weeks:26,
-        // Budget Coursera+ global (voir récapitulatif budget)
         budget:'Inclus Coursera+ (205€/an)', budgetN:0,
-        status:'en_cours',
-        note:'POINT D\'ENTRÉE. SQL, Tableau, R basique, analyse de données réelles. Conçu pour les non-techniciens. Certification Google reconnue mondialement. Commence dès aujourd\'hui.',
+        status:'en_cours', progress:0,
+        note:'POINT D\'ENTRÉE. SQL, Tableau, R basique, analyse de données réelles. Certification Google reconnue mondialement.',
+        // Les 8 cours du certificat Google Data Analytics
+        subs:[
+          'Course 1 · Foundations: Data, Data, Everywhere',
+          'Course 2 · Ask Questions to Make Data-Driven Decisions',
+          'Course 3 · Prepare Data for Exploration',
+          'Course 4 · Process Data from Dirty to Clean',
+          'Course 5 · Analyze Data to Answer Questions',
+          'Course 6 · Share Data Through the Art of Visualization',
+          'Course 7 · Data Analysis with R Programming',
+          'Course 8 · Google Data Analytics Capstone Project',
+        ]},
+      { id:'stan-cip', title:'Stanford Code in Place',
+        provider:'Stanford University · Gratuit · Sélection sur dossier',
+        url:'https://codeinplace.stanford.edu/',
+        applyDate:'Candidature en cours', applyUrgent:false,
+        start:'23 avril 2026', end:'5 juin 2026',
+        hours:25, weeks:6, budget:'Gratuit', budgetN:0,
+        status:'en_cours', progress:0,
+        note:'Cours Python en direct tous les jeudis à 14h pendant 6 semaines. Section leader hebdomadaire + exercices. Début : 23 avril 2026.',
         subs:[] },
       { id:'harv-cs50', title:'Harvard CS50 – Introduction to Computer Science',
         provider:'Harvard University · edX', url:'https://cs50.harvard.edu/x/',
@@ -990,8 +995,8 @@ const BLOCS = [
         start:'À définir (après Google DA)', end:'2027',
         hours:100, weeks:15,
         budget:'Gratuit (audit) · ~140€ certificat', budgetN:140,
-        status:'a_faire',
-        note:'Culture informatique fondamentale : algorithmes, mémoire, web, Python. Harvard crédibilise le CV. À démarrer une fois Google DA bien avancé.',
+        status:'a_faire', progress:0,
+        note:'Culture informatique fondamentale : algorithmes, mémoire, web, Python. Harvard crédibilise le CV.',
         subs:[] },
     ]},
 
@@ -1006,8 +1011,8 @@ const BLOCS = [
         start:'mai 2026', end:'août 2026',
         hours:40, weeks:14,
         budget:'Inclus Coursera+ (205€/an)', budgetN:0,
-        status:'a_faire',
-        note:'Fondations Python solides : variables, fonctions, structures de données, fichiers. Spécialisation complète en 5 cours. À démarrer après les premières semaines Google DA.',
+        status:'a_faire', progress:0,
+        note:'Fondations Python solides : variables, fonctions, structures de données, fichiers. Spécialisation complète en 5 cours.',
         subs:[] },
       { id:'sql-uc', title:'SQL for Data Science',
         provider:'Coursera · UC Davis',
@@ -1016,15 +1021,15 @@ const BLOCS = [
         start:'juin 2026', end:'juillet 2026',
         hours:25, weeks:4,
         budget:'Inclus Coursera+ (205€/an)', budgetN:0,
-        status:'a_faire',
-        note:'SQL appliqué aux bases de données hospitalières : PMSI, entrepôts de santé. Peut se mener en parallèle de Python for Everybody.',
+        status:'a_faire', progress:0,
+        note:'SQL appliqué aux bases de données hospitalières : PMSI, entrepôts de santé.',
         subs:[] },
       { id:'du-phds', title:'DU PHDS – Population Health Data Science',
         provider:'ISPED · Université de Bordeaux', url:'https://www.isped.u-bordeaux.fr/',
         applyDate:'1er mai 2026 ⚠️', applyUrgent:true,
         start:'13 oct. 2026', end:'juin 2027',
         hours:180, weeks:36, budget:'1 300€', budgetN:1300,
-        status:'a_faire',
+        status:'a_faire', progress:0,
         note:'PIÈCE CENTRALE. Seul diplôme académique français dédié aux données de santé. Épidémiologie, biostatistiques, PMSI, SNDS, éthique.',
         subs:[
           'Module 1 · Digital tools for data sciences — 30h',
@@ -1291,7 +1296,6 @@ function renderBlocs() {
     const done = bloc.formations.filter(f => (st[f.id] || f.status) === 'fait').length;
     const p    = Math.round(done / bloc.formations.length * 100);
 
-    // Création du conteneur du bloc
     const div = document.createElement('div');
     div.className = 'bloc';
     div.id = bloc.id;
@@ -1301,24 +1305,51 @@ function renderBlocs() {
         <span class="bloc-name">${bloc.name}</span>
         <span class="bloc-meta">${done}/${bloc.formations.length} · ${p}%</span>
       </div>
-      <!-- Barre de progression du bloc -->
-      <div class="bloc-progbar">
-        <div class="bloc-progfill" style="width:${p}%;background:${bloc.color}"></div>
-      </div>
+      <div class="bloc-progbar"><div class="bloc-progfill" style="width:${p}%;background:${bloc.color}"></div></div>
       <div class="bloc-body" id="bb-${bloc.id}"></div>`;
     out.appendChild(div);
 
-    // Injection des formations dans le bloc
     const body = document.getElementById('bb-' + bloc.id);
     bloc.formations.forEach(f => {
-      const s  = st[f.id] || f.status;
+      const s = st[f.id] || f.status;
+
+      // Récupère les sous-étapes cochées depuis localStorage
+      const subsKey    = 'subs_' + f.id;
+      const subsChecked = G(subsKey) || [];
+
+      // Calcule la progression : si des sous-étapes existent, basée sur elles
+      // sinon basée sur le statut (0%, 50%, 100%)
+      let fProgress = 0;
+      if (f.subs.length > 0) {
+        fProgress = Math.round(subsChecked.length / f.subs.length * 100);
+      } else {
+        fProgress = s === 'fait' ? 100 : s === 'en_cours' ? 10 : 0;
+      }
+
       const fc = document.createElement('div');
       fc.className = 'fcard';
 
-      // Sous-modules (si présents)
-      const subs = f.subs.length
-        ? `<div class="sub-list">${f.subs.map(s => `<div class="sub-item">${s}</div>`).join('')}</div>`
-        : '';
+      // Génère les sous-étapes cochables
+      const subsHtml = f.subs.length ? `
+        <div style="margin-bottom:12px;">
+          <div style="font-family:var(--f-mono);font-size:10px;color:var(--c-muted);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px;">
+            Étapes · ${subsChecked.length}/${f.subs.length} complétées
+          </div>
+          ${f.subs.map((sub, i) => {
+            const checked = subsChecked.includes(i);
+            return `<div onclick="toggleSub('${f.id}',${i})"
+              style="display:flex;align-items:center;gap:10px;padding:8px 10px;margin-bottom:4px;
+                border-radius:7px;background:var(--s2);border:1px solid var(--wb);cursor:pointer;
+                transition:all .15s;${checked ? 'opacity:.55;' : ''}">
+              <div style="width:18px;height:18px;border-radius:4px;flex-shrink:0;border:2px solid ${checked ? 'var(--c-green)' : 'var(--c-dim)'};
+                background:${checked ? 'var(--c-green)' : 'transparent'};
+                display:flex;align-items:center;justify-content:center;">
+                ${checked ? '<span style="color:#08090e;font-size:11px;font-weight:700">✓</span>' : ''}
+              </div>
+              <span style="font-size:13px;${checked ? 'text-decoration:line-through;color:var(--c-muted)' : 'color:var(--c-text)'}">${sub}</span>
+            </div>`;
+          }).join('')}
+        </div>` : '';
 
       fc.innerHTML = `
         <div class="fc-top">
@@ -1327,44 +1358,57 @@ function renderBlocs() {
             <div class="fc-provider">${f.provider}</div>
           </div>
           <div class="fc-right">
-            <!-- Badge statut cliquable (À faire → En cours → Terminé) -->
             <span class="s-badge ${s}" data-id="${f.id}">${SL[s]}</span>
             ${f.url !== '#' ? `<a class="fc-link" href="${f.url}" target="_blank">→ Accéder</a>` : ''}
           </div>
         </div>
-        <!-- Grille de méta-données -->
-        <div class="fc-grid">
-          <div class="fc-field">
-            <div class="fc-fl">Inscription</div>
-            <div class="fc-fv ${f.applyUrgent ? 'urg' : ''}">${f.applyDate}</div>
+        <!-- Barre de progression individuelle de la formation -->
+        <div style="margin-bottom:14px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
+            <div style="font-family:var(--f-mono);font-size:10px;color:var(--c-muted);text-transform:uppercase;letter-spacing:.1em;">Avancement</div>
+            <div style="font-family:var(--f-mono);font-size:13px;font-weight:700;color:${bloc.color}">${fProgress}%</div>
           </div>
+          <div style="height:7px;background:var(--s3);border-radius:4px;overflow:hidden;">
+            <div style="height:100%;width:${fProgress}%;background:${bloc.color};border-radius:4px;transition:width .6s ease;"></div>
+          </div>
+        </div>
+        <div class="fc-grid">
+          <div class="fc-field"><div class="fc-fl">Inscription</div><div class="fc-fv ${f.applyUrgent ? 'urg' : ''}">${f.applyDate}</div></div>
           <div class="fc-field"><div class="fc-fl">Début</div><div class="fc-fv">${f.start}</div></div>
           <div class="fc-field"><div class="fc-fl">Fin</div><div class="fc-fv">${f.end}</div></div>
-          <div class="fc-field">
-            <div class="fc-fl">Durée</div>
-            <div class="fc-fv">${f.hours ? f.hours + 'h' : '—'}${f.weeks ? ' · ' + f.weeks + ' sem.' : ''}</div>
-          </div>
+          <div class="fc-field"><div class="fc-fl">Durée</div><div class="fc-fv">${f.hours ? f.hours + 'h' : '—'}${f.weeks ? ' · ' + f.weeks + ' sem.' : ''}</div></div>
           <div class="fc-field"><div class="fc-fl">Budget</div><div class="fc-fv bgt">${f.budget}</div></div>
         </div>
-        ${subs}
+        ${subsHtml}
         <div class="fc-note">${f.note}</div>`;
       body.appendChild(fc);
     });
   });
 
   // Événements sur les badges de statut
-  // Un clic fait avancer le statut : À faire → En cours → Terminé → À faire
   document.querySelectorAll('.s-badge[data-id]').forEach(b => {
     b.addEventListener('click', () => {
       const id  = b.dataset.id;
       const cur = b.className.match(/a_faire|en_cours|fait/)?.[0] || 'a_faire';
-      saveSt(id, SN[cur]);                  // sauvegarde le nouveau statut
-      renderBlocs();                         // re-rendu des blocs
-      updateProgress();                      // mise à jour progression
-      renderStats();                         // mise à jour stats
-      renderDeadlines();                     // mise à jour deadlines
+      saveSt(id, SN[cur]);
+      renderBlocs();
+      updateProgress();
+      renderStats();
+      renderDeadlines();
     });
   });
+}
+
+// Coche/décoche une sous-étape et sauvegarde
+function toggleSub(formationId, subIndex) {
+  const key     = 'subs_' + formationId;
+  const checked = G(key) || [];
+  const i       = checked.indexOf(subIndex);
+  if (i > -1) checked.splice(i, 1); // décoche
+  else checked.push(subIndex);       // coche
+  W(key, checked);
+  renderBlocs(); // re-rendu pour mise à jour visuelle
+  updateProgress();
 }
 
 // ════════════════════════════════════════════════════════
