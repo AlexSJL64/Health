@@ -509,6 +509,7 @@ input,textarea,select{ font-family:var(--f-sans); outline:none; }
 <button class="sb-item" onclick="nav('formations');later('b2')"><span class="sb-dot" style="background:#8b6fff"></span> B2 · Data Eng.</button>
 <button class="sb-item" onclick="nav('formations');later('b3')"><span class="sb-dot" style="background:#00e096"></span> B3 · ML / IA</button>
 <button class="sb-item" onclick="nav('formations');later('b4')"><span class="sb-dot" style="background:#ff7c3d"></span> B4 · Leadership</button>
+<button class="sb-item" onclick="nav('formations');later('b5')"><span class="sb-dot" style="background:#06c8a0"></span> B5 · Blockchain</button>
 ```
 
   </nav>
@@ -842,44 +843,7 @@ input,textarea,select{ font-family:var(--f-sans); outline:none; }
 
   </main>
 </div><!-- fin .content -->
-
-<!-- ═══════════════════════════════════════
-     POST-IT ROSE (notes rapides)
-     Flottant sur le bord droit de l'écran
-     Cliquez dessus pour l'ouvrir/fermer
-     ═══════════════════════════════════════ -->
-
-<!-- Languette toujours visible sur le bord droit -->
-
-<div id="pink-postit-btn" onclick="togglePinkPostit()"
-  style="position:fixed;right:0;top:50%;transform:translateY(-50%);
-    background:#fce4ec;border:1px solid #f48fb1;border-right:none;
-    border-radius:12px 0 0 12px;padding:12px 8px;cursor:pointer;
-    writing-mode:vertical-rl;font-family:var(--f-mono);font-size:11px;
-    color:#c2185b;letter-spacing:.1em;text-transform:uppercase;
-    box-shadow:-3px 0 16px rgba(0,0,0,.35);z-index:9999;">
-  📝 Notes
-</div>
-
-<!-- Panneau rose expansible -->
-
-<div id="pink-postit"
-  style="position:fixed;right:0;top:50%;transform:translateY(-50%);
-    width:290px;background:#fce4ec;border:1px solid #f48fb1;border-right:none;
-    border-radius:16px 0 0 16px;padding:20px;
-    box-shadow:-4px 0 28px rgba(0,0,0,.4);z-index:9999;
-    display:none;flex-direction:column;gap:10px;">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-    <div style="font-family:var(--f-mono);font-size:11px;font-weight:700;color:#880e4f;text-transform:uppercase;letter-spacing:.12em;">📝 Notes rapides</div>
-    <button onclick="togglePinkPostit()" style="background:none;border:none;color:#c2185b;font-size:20px;cursor:pointer;line-height:1;">×</button>
-  </div>
-  <textarea id="pink-notes" oninput="savePinkNotes()"
-    style="background:rgba(255,255,255,0.65);border:1px solid #f48fb1;border-radius:8px;
-      padding:10px;color:#3e0018;font-size:14px;resize:none;min-height:220px;
-      line-height:1.75;font-family:var(--f-sans);"
-    placeholder="Notes rapides…&#10;— À faire aujourd'hui&#10;— Question pour le DIM&#10;— Idée de projet"></textarea>
-  <div style="font-family:var(--f-mono);font-size:10px;color:#c2185b;text-align:right;">Sauvegarde auto ✓</div>
-</div>
+</div><!-- fin .shell -->
 
 <!-- ═══════════════════════════════════
      MODALE : Ajouter un bloc planning
@@ -1088,6 +1052,40 @@ const BLOCS = [
         hours:null, weeks:null, budget:'FIFPL / employeur', budgetN:0,
         status:'a_faire',
         note:'Réseau C-suite et légitimité dirigeante. Profil médecin+data = atout réel pour HEC Executive.',
+        subs:[] },
+    ]},
+
+  // ── BLOC 5 : BLOCKCHAIN & WEB3 SANTÉ ────────────────────
+  // Orienté culture et stratégie — pas technique pure
+  // Objectif : différenciation CDO santé, profil rare en France
+  { id:'b5', num:'B5', name:'Blockchain & Web3 · Santé', color:'#06c8a0',
+    formations:[
+      { id:'fun-blockchain', title:'MOOC Blockchain & Santé',
+        provider:'FUN MOOC · France Université Numérique',
+        url:'https://www.fun-mooc.fr/',
+        applyDate:'Vérifier les sessions disponibles', applyUrgent:false,
+        start:'2027', end:'2027',
+        hours:10, weeks:3, budget:'Gratuit', budgetN:0,
+        status:'a_faire', progress:0,
+        note:'À faire EN PREMIER. Cas d\'usage santé en français : partage de dossiers patients, traçabilité médicament (directive EU Falsified Medicines), consentement horodaté. Intervenants hospitaliers français.',
+        subs:[] },
+      { id:'mit-blockchain', title:'Blockchain and Money — Gary Gensler',
+        provider:'MIT OpenCourseWare · Gratuit',
+        url:'https://ocw.mit.edu/courses/15-s12-blockchain-and-money-fall-2018/',
+        applyDate:'Disponible en ligne', applyUrgent:false,
+        start:'2027', end:'2027',
+        hours:15, weeks:4, budget:'Gratuit', budgetN:0,
+        status:'a_faire', progress:0,
+        note:'Vision stratégique par l\'ex-président de la SEC américaine. Gouvernance, réglementation, décision d\'investissement. Donne le vocabulaire pour convaincre des décideurs. MIT crédibilise le parcours.',
+        subs:[] },
+      { id:'coursera-blockchain', title:'Blockchain Basics',
+        provider:'Coursera · University at Buffalo',
+        url:'https://www.coursera.org/learn/blockchain-basics',
+        applyDate:'Inscription libre', applyUrgent:false,
+        start:'2027', end:'2027',
+        hours:12, weeks:4, budget:'Inclus Coursera+ (205€/an)', budgetN:0,
+        status:'a_faire', progress:0,
+        note:'Fondamentaux techniques accessibles sans background développeur. Complète le MOOC FUN et MIT avec des bases concrètes sur les protocoles et smart contracts.',
         subs:[] },
     ]},
 ];
@@ -1984,6 +1982,49 @@ loadProjet();
 loadPinkNotes();
 
 </script>
+
+<!-- ═══════════════════════════════════════════════════════
+     POST-IT ROSE — EN DEHORS DE TOUT CONTENEUR
+     position:fixed fonctionne uniquement hors de tout
+     div avec overflow:auto ou transform CSS
+     ═══════════════════════════════════════════════════════ -->
+
+<!-- Languette verticale permanente -->
+
+<div id="pink-postit-btn" onclick="togglePinkPostit()"
+  style="position:fixed;right:0;top:45%;transform:translateY(-50%);
+    background:#fce4ec;border:2px solid #f48fb1;border-right:none;
+    border-radius:10px 0 0 10px;padding:14px 9px;cursor:pointer;
+    writing-mode:vertical-rl;font-family:'DM Mono',monospace;font-size:12px;
+    font-weight:600;color:#c2185b;letter-spacing:.12em;text-transform:uppercase;
+    box-shadow:-4px 0 20px rgba(194,24,91,.25);z-index:99999;">
+  📝 Notes
+</div>
+
+<!-- Panneau rose complet -->
+
+<div id="pink-postit"
+  style="position:fixed;right:0;top:50%;transform:translateY(-50%);
+    width:300px;background:#fce4ec;border:2px solid #f48fb1;border-right:none;
+    border-radius:16px 0 0 16px;padding:20px 18px;
+    box-shadow:-6px 0 32px rgba(194,24,91,.3);z-index:99999;
+    display:none;flex-direction:column;gap:12px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;">
+    <div style="font-family:'DM Mono',monospace;font-size:11px;font-weight:700;
+      color:#880e4f;text-transform:uppercase;letter-spacing:.14em;">📝 Notes rapides</div>
+    <button onclick="togglePinkPostit()"
+      style="background:rgba(194,24,91,.1);border:1px solid #f48fb1;border-radius:6px;
+        color:#c2185b;font-size:18px;cursor:pointer;width:28px;height:28px;
+        display:flex;align-items:center;justify-content:center;line-height:1;">×</button>
+  </div>
+  <textarea id="pink-notes" oninput="savePinkNotes()"
+    style="background:rgba(255,255,255,.7);border:1px solid #f48fb1;border-radius:8px;
+      padding:12px;color:#3e0018;font-size:14px;resize:none;min-height:240px;
+      line-height:1.8;font-family:'DM Sans',sans-serif;"
+    placeholder="Notes rapides…&#10;— À faire aujourd'hui&#10;— Questions pour le DIM&#10;— Idée de projet data&#10;— Vocabulaire&#10;…"></textarea>
+  <div style="font-family:'DM Mono',monospace;font-size:10px;color:#c2185b;text-align:right;
+    letter-spacing:.08em;">✓ Sauvegarde automatique</div>
+</div>
 
 </body>
 </html>
