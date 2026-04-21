@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CDO Med · Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:#08090e; --s1:#0f1118; --s2:#14161f; --s3:#1c1f2e;
+  --wb:rgba(255,255,255,0.08); --wb2:rgba(255,255,255,0.15);
+  --green:#00e096; --blue:#3d9bff; --purple:#8b6fff;
+  --orange:#ff7c3d; --red:#ff3d5a; --gold:#ffc53d; --teal:#06c8a0;
+  --text:#dde4f0; --muted:#7a869a; --dim:#3a4256;
+  --sans:'DM Sans',sans-serif; --mono:'DM Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.5;min-height:100vh;}
+a{color:var(--blue);text-decoration:none;}
+a:hover{text-decoration:underline;}
+button{cursor:pointer;font-family:var(--sans);}
+input,textarea,select{font-family:var(--sans);outline:none;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-thumb{background:var(--wb2);border-radius:2px;}
+
+/* LAYOUT */
+.shell{display:flex;min-height:100vh;}
+.sidebar{width:220px;flex-shrink:0;background:var(–s1);border-right:1px solid var(–wb);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.content{flex:1;min-width:0;display:flex;flex-direction:column;height:100vh;overflow-y:auto;}
+.topbar{background:var(–s1);border-bottom:1px solid var(–wb);padding:0 28px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.main{flex:1;padding:24px 28px 80px;}
+
+@media(max-width:768px){
+.sidebar{display:none;}
+.topbar{padding:0 16px;}
+.main{padding:16px 16px 80px;}
+.mob-nav{display:flex!important;}
+}
+.mob-nav{display:none;overflow-x:auto;gap:6px;padding:10px 16px;background:var(–s1);border-bottom:1px solid var(–wb);flex-shrink:0;}
+.mob-btn{padding:6px 14px;border-radius:20px;border:1px solid var(–wb);background:transparent;color:var(–muted);font-size:12px;white-space:nowrap;}
+.mob-btn.active{background:var(–s3);color:#fff;border-color:var(–wb2);}
+
+/* SIDEBAR */
+.sb-logo{padding:22px 18px 16px;border-bottom:1px solid var(–wb);}
+.sb-eyebrow{font-family:var(–mono);font-size:10px;color:var(–green);letter-spacing:.18em;text-transform:uppercase;margin-bottom:5px;}
+.sb-title{font-size:16px;font-weight:700;color:#fff;line-height:1.2;}
+.sb-date{font-size:12px;color:var(–muted);margin-top:4px;font-family:var(–mono);}
+.sb-nav{padding:12px 8px;flex:1;}
+.sb-sec{font-family:var(–mono);font-size:10px;color:var(–dim);text-transform:uppercase;letter-spacing:.15em;padding:8px 10px 6px;}
+.sbi{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;font-size:14px;font-weight:500;color:#c8d0e8;transition:all .15s;cursor:pointer;border:none;border-left:2px solid transparent;background:none;width:100%;text-align:left;}
+.sbi:hover{background:var(–s3);color:#fff;}
+.sbi.active{background:var(–s3);color:#fff;border-left-color:var(–green);}
+.sbi .ico{font-size:15px;width:20px;text-align:center;flex-shrink:0;}
+.sb-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.sb-bot{padding:14px 16px;border-top:1px solid var(–wb);}
+.sb-pct-lbl{font-family:var(–mono);font-size:10px;color:var(–muted);text-transform:uppercase;letter-spacing:.12em;margin-bottom:5px;}
+.sb-pct{font-size:26px;font-weight:700;color:var(–green);line-height:1;}
+.sb-track{height:4px;background:var(–s3);border-radius:2px;margin-top:7px;overflow:hidden;}
+.sb-fill{height:100%;background:linear-gradient(90deg,var(–green),#00ffc8);border-radius:2px;transition:width .8s ease;}
+.sb-cnt{font-size:12px;color:var(–muted);margin-top:5px;font-family:var(–mono);}
+
+/* TOPBAR */
+.tb-date{font-family:var(–mono);font-size:13px;color:var(–muted);}
+.tb-right{display:flex;align-items:center;gap:10px;}
+.tb-pill{font-family:var(–mono);font-size:12px;color:var(–muted);border:1px solid var(–wb);border-radius:100px;padding:4px 12px;}
+.tb-pill strong{color:var(–orange);}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(–green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+/* SECTIONS */
+.sec{display:none;}
+.sec.on{display:block;}
+
+/* TIMELINE */
+.tl-card{background:var(–s1);border:1px solid var(–wb);border-radius:14px;padding:18px 22px;margin-bottom:18px;}
+.tl-top{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:12px;}
+.tl-hero{font-size:15px;font-weight:600;color:#fff;margin-bottom:2px;}
+.tl-sub{font-size:12px;color:var(–muted);font-family:var(–mono);}
+.tl-pct{font-size:32px;font-weight:700;color:var(–green);line-height:1;}
+.tl-track{height:10px;background:var(–s3);border-radius:5px;overflow:hidden;}
+.tl-fill{height:100%;background:linear-gradient(90deg,var(–green),#00ffc8);border-radius:5px;transition:width 1s ease;}
+.tl-ms{display:flex;justify-content:space-between;margin-top:10px;}
+.tl-m{font-family:var(–mono);font-size:10px;color:var(–dim);text-align:center;}
+.tl-m.done{color:var(–green);}
+
+/* POST-IT JAUNE */
+.postit{background:#fefce8;border-left:5px solid #d4b800;border-radius:4px 12px 12px 4px;padding:18px 20px;margin-bottom:18px;position:relative;box-shadow:0 4px 24px rgba(0,0,0,.4);}
+.postit::before{content:‘📌’;position:absolute;top:-8px;right:18px;font-size:20px;}
+.pi-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.pi-tag{font-family:var(–mono);font-size:10px;font-weight:700;color:#6b5300;text-transform:uppercase;letter-spacing:.15em;}
+.pi-btn{background:rgba(0,0,0,.08);border:1px solid rgba(0,0,0,.12);border-radius:6px;font-size:11px;padding:3px 9px;font-family:var(–mono);color:#5a4400;cursor:pointer;}
+.pi-text{font-size:15px;line-height:1.7;color:#1e1400;min-height:44px;}
+.pi-date{font-family:var(–mono);font-size:11px;color:#8a7000;margin-top:8px;}
+
+/* NEWSLETTER PASTE */
+.nl-paste{background:var(–s1);border:1px solid var(–wb);border-radius:14px;padding:20px;margin-bottom:18px;}
+.nl-ta{width:100%;background:var(–s2);border:1px solid var(–wb);border-radius:8px;padding:12px 14px;color:var(–text);font-size:14px;resize:vertical;min-height:80px;line-height:1.65;transition:border-color .15s;}
+.nl-ta:focus{border-color:var(–gold);}
+.sum-btn{margin-top:10px;padding:10px 20px;border-radius:8px;border:none;background:var(–gold);color:#1a1200;font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;transition:opacity .2s;}
+.sum-btn:hover{opacity:.85;}
+.sum-btn:disabled{opacity:.4;cursor:not-allowed;}
+.sum-res{margin-top:12px;padding:14px;background:#fffde7;border-left:4px solid #d4b800;border-radius:4px 10px 10px 4px;font-size:14px;line-height:1.7;color:#1e1400;display:none;}
+
+/* STATS */
+.stats4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px;}
+@media(max-width:700px){.stats4{grid-template-columns:repeat(2,1fr);}}
+.stat{background:var(–s1);border:1px solid var(–wb);border-radius:12px;padding:16px;}
+.stat-n{font-size:28px;font-weight:700;line-height:1;letter-spacing:-.02em;}
+.stat-l{font-family:var(–mono);font-size:10px;color:var(–muted);margin-top:5px;text-transform:uppercase;}
+.stat-bar{height:2px;border-radius:1px;margin-top:10px;opacity:.5;}
+
+/* CARD */
+.card{background:var(–s1);border:1px solid var(–wb);border-radius:14px;padding:22px;margin-bottom:18px;}
+.card-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.card-ttl{font-family:var(–mono);font-size:11px;color:var(–muted);text-transform:uppercase;letter-spacing:.14em;}
+.card-act{font-size:12px;color:var(–blue);font-family:var(–mono);background:none;border:1px solid rgba(61,155,255,.2);border-radius:5px;padding:4px 10px;cursor:pointer;}
+.card-act:hover{background:rgba(61,155,255,.08);}
+
+/* DISCIPLINE */
+.disc7{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;}
+.disc-d{background:var(–s2);border:1px solid var(–wb);border-radius:8px;padding:9px 4px;text-align:center;cursor:pointer;transition:all .15s;}
+.disc-d.done{background:rgba(0,224,150,.08);border-color:rgba(0,224,150,.35);}
+.disc-d.today{border-color:var(–blue);}
+.disc-dn{font-family:var(–mono);font-size:10px;color:var(–muted);text-transform:uppercase;margin-bottom:3px;}
+.disc-num{font-size:15px;font-weight:700;}
+.disc-ck{font-size:13px;margin-top:3px;}
+
+/* DEADLINES */
+.dl-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(–wb);}
+.dl-row:last-child{border-bottom:none;}
+.dl-stripe{width:3px;height:32px;border-radius:2px;flex-shrink:0;}
+.dl-name{font-size:14px;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dl-date{font-size:11px;color:var(–muted);margin-top:2px;font-family:var(–mono);}
+.dl-badge{font-family:var(–mono);font-size:11px;padding:3px 9px;border-radius:4px;white-space:nowrap;flex-shrink:0;margin-left:auto;}
+
+/* BLOCS */
+.bloc{background:var(–s1);border:1px solid var(–wb);border-radius:14px;overflow:hidden;margin-bottom:18px;}
+.bloc-hd{padding:16px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(–wb);}
+.bloc-badge{font-family:var(–mono);font-size:11px;font-weight:700;padding:4px 9px;border-radius:5px;}
+.bloc-name{font-size:17px;font-weight:700;flex:1;color:#fff;}
+.bloc-meta{font-family:var(–mono);font-size:12px;color:var(–muted);}
+.bloc-pb{height:3px;background:var(–s3);}
+.bloc-pf{height:100%;transition:width .8s ease;}
+.bloc-body{padding:0 20px;}
+
+/* FORMATION CARD */
+.fcard{padding:18px 0;border-bottom:1px solid var(–wb);}
+.fcard:last-child{border-bottom:none;}
+.fc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px;}
+.fc-title{font-size:16px;font-weight:700;line-height:1.3;color:#fff;}
+.fc-prov{font-family:var(–mono);font-size:11px;color:var(–muted);margin-top:3px;text-transform:uppercase;}
+.fc-right{display:flex;flex-direction:column;align-items:flex-end;gap:7px;flex-shrink:0;}
+.fc-link{font-family:var(–mono);font-size:11px;color:var(–blue);border:1px solid var(–wb);padding:4px 10px;border-radius:6px;white-space:nowrap;transition:all .15s;}
+.fc-link:hover{background:var(–s3);border-color:var(–blue);}
+.s-badge{display:inline-flex;align-items:center;gap:5px;font-family:var(–mono);font-size:10px;text-transform:uppercase;padding:4px 10px;border-radius:100px;cursor:pointer;transition:opacity .15s;border:1px solid;}
+.s-badge:hover{opacity:.75;}
+.s-badge.a_faire{background:rgba(122,134,154,.08);color:var(–muted);border-color:var(–wb);}
+.s-badge.en_cours{background:rgba(61,155,255,.1);color:var(–blue);border-color:rgba(61,155,255,.3);}
+.s-badge.fait{background:rgba(0,224,150,.1);color:var(–green);border-color:rgba(0,224,150,.3);}
+.fc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:12px;}
+.fc-fl{font-family:var(–mono);font-size:9px;letter-spacing:.12em;color:var(–muted);text-transform:uppercase;margin-bottom:3px;}
+.fc-fv{font-family:var(–mono);font-size:12px;color:var(–text);}
+.fc-fv.urg{color:var(–red);font-weight:700;}
+.fc-fv.bgt{color:var(–orange);}
+.fc-note{font-size:13px;color:var(–muted);line-height:1.65;padding:11px 14px;background:var(–s2);border-radius:8px;border-left:3px solid var(–wb2);}
+
+/* SUBSTEPS */
+.sub-step{display:flex;align-items:center;gap:10px;padding:8px 10px;margin-bottom:4px;border-radius:7px;background:var(–s2);border:1px solid var(–wb);cursor:pointer;transition:all .15s;}
+.sub-step:hover{border-color:var(–wb2);}
+.sub-check{width:18px;height:18px;border-radius:4px;flex-shrink:0;border:2px solid var(–dim);display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.sub-check.done{border-color:var(–green);background:var(–green);}
+.sub-label{font-size:13px;transition:all .15s;}
+.sub-label.done{text-decoration:line-through;color:var(–muted);}
+
+/* BUDGET */
+.bgt-row{display:flex;justify-content:space-between;align-items:center;font-family:var(–mono);font-size:13px;padding:9px 0;border-bottom:1px solid var(–wb);}
+.bgt-row:last-of-type{border-bottom:none;}
+.bgt-row .a{color:var(–orange);}
+.bgt-row .f{color:var(–green);}
+.bgt-total{display:flex;justify-content:space-between;font-size:18px;font-weight:700;margin-top:12px;padding-top:12px;border-top:1px solid var(–wb2);}
+.bgt-total .a{color:var(–orange);}
+
+/* PLANNING */
+.week7{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;margin-bottom:18px;}
+.wday{background:var(–s2);border:1px solid var(–wb);border-radius:9px;padding:9px 5px;text-align:center;cursor:pointer;transition:all .15s;}
+.wday.today{border-color:var(–blue);background:rgba(61,155,255,.06);}
+.wday.sel{border-color:var(–green);background:rgba(0,224,150,.06);}
+.wd-n{font-family:var(–mono);font-size:10px;color:var(–muted);text-transform:uppercase;margin-bottom:4px;}
+.wd-d{font-size:16px;font-weight:700;}
+.wd-dot{width:5px;height:5px;border-radius:50%;background:var(–purple);margin:4px auto 0;}
+.blk{display:flex;gap:12px;padding:13px 15px;background:var(–s2);border-radius:10px;border:1px solid var(–wb);border-left-width:4px;margin-bottom:8px;}
+.blk-time{font-family:var(–mono);font-size:12px;color:var(–muted);width:44px;flex-shrink:0;padding-top:2px;}
+.blk-title{font-size:15px;font-weight:600;}
+.blk-sub{font-size:12px;color:var(–muted);margin-top:2px;font-family:var(–mono);}
+.deep-tag{display:inline-block;font-family:var(–mono);font-size:9px;padding:2px 7px;border-radius:3px;background:rgba(139,111,255,.15);color:var(–purple);border:1px solid rgba(139,111,255,.25);margin-top:4px;}
+
+/* NEWS */
+.news-item{display:flex;gap:14px;padding:15px 0;border-bottom:1px solid var(–wb);}
+.news-item:last-child{border-bottom:none;}
+.news-num{font-family:var(–mono);font-size:12px;color:var(–dim);width:22px;flex-shrink:0;padding-top:2px;}
+.news-title{font-size:16px;font-weight:600;margin-bottom:5px;line-height:1.4;}
+.news-sum{font-size:13px;color:var(–muted);line-height:1.6;margin-bottom:5px;}
+.news-meta{font-family:var(–mono);font-size:11px;color:var(–blue);}
+.nl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px;}
+@media(max-width:700px){.nl-grid{grid-template-columns:1fr 1fr;}}
+.nl-card{background:var(–s2);border:1px solid var(–wb);border-radius:11px;padding:15px;display:flex;flex-direction:column;gap:7px;transition:border-color .15s;}
+.nl-card:hover{border-color:var(–blue);}
+.nl-ico{font-size:22px;}
+.nl-name{font-size:15px;font-weight:600;color:#fff;}
+.nl-desc{font-size:12px;color:var(–muted);line-height:1.5;flex:1;}
+.nl-url{font-family:var(–mono);font-size:11px;color:var(–blue);}
+
+/* QUIZ */
+.quiz-wrap{background:var(–s2);border:1px solid var(–wb);border-radius:12px;padding:20px;}
+.quiz-q{font-size:17px;font-weight:600;line-height:1.5;margin-bottom:14px;color:#fff;}
+.quiz-opts{display:flex;flex-direction:column;gap:7px;}
+.qopt{padding:12px 16px;border-radius:8px;border:1px solid var(–wb);background:var(–s1);font-size:15px;text-align:left;color:var(–text);transition:all .15s;}
+.qopt:hover{border-color:var(–purple);}
+.qopt.correct{border-color:var(–green);background:rgba(0,224,150,.07);color:var(–green);}
+.qopt.wrong{border-color:var(–red);background:rgba(255,61,90,.07);color:var(–red);}
+.q-exp{font-size:13px;color:var(–muted);margin-top:12px;padding-top:12px;border-top:1px solid var(–wb);font-family:var(–mono);line-height:1.7;}
+.quiz-score{display:inline-flex;align-items:center;gap:8px;font-family:var(–mono);font-size:13px;color:var(–gold);background:rgba(255,197,61,.08);border:1px solid rgba(255,197,61,.2);border-radius:8px;padding:8px 14px;margin-bottom:14px;}
+.code-area{width:100%;background:#0a0c14;border:1px solid var(–wb);border-radius:8px;padding:14px;color:#a8d5a2;font-family:var(–mono);font-size:13px;resize:none;min-height:80px;line-height:1.7;margin:10px 0;}
+.run-btn{padding:9px 20px;border-radius:7px;border:none;background:var(–green);color:#08090e;font-weight:700;font-size:13px;font-family:var(–mono);}
+.code-out{font-family:var(–mono);font-size:13px;padding:12px 14px;background:#0a0c14;border-radius:7px;border:1px solid var(–wb);margin-top:8px;white-space:pre-wrap;}
+
+/* COACH */
+.coach-ta{width:100%;background:var(–s2);border:1px solid var(–wb);border-radius:10px;padding:14px;color:var(–text);font-size:15px;resize:none;min-height:90px;line-height:1.7;transition:border-color .15s;}
+.coach-ta:focus{border-color:var(–purple);}
+.ana-btn{width:100%;padding:13px;border-radius:10px;border:none;background:var(–purple);color:#fff;font-size:15px;font-weight:600;margin-top:10px;transition:opacity .2s;}
+.ana-btn:hover{opacity:.85;}
+.ana-btn:disabled{opacity:.4;}
+.r-block{background:var(–s2);border:1px solid var(–wb);border-radius:10px;padding:15px;margin-top:10px;}
+.r-lbl{font-family:var(–mono);font-size:10px;color:var(–muted);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px;}
+.r-txt{font-size:15px;line-height:1.75;color:#c0c8e0;white-space:pre-wrap;}
+
+/* PROJET */
+.proj-input{width:100%;background:var(–s2);border:1px solid var(–wb);border-radius:8px;padding:10px 14px;color:var(–text);font-size:16px;font-weight:600;transition:border-color .15s;margin-bottom:12px;}
+.proj-input:focus{border-color:var(–blue);}
+.proj-ta{width:100%;background:var(–s2);border:1px solid var(–wb);border-radius:10px;padding:16px;color:var(–text);font-size:15px;resize:vertical;min-height:320px;line-height:1.75;transition:border-color .15s;}
+.proj-ta:focus{border-color:var(–blue);}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(5px);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;}
+.modal{background:var(–s1);border:1px solid var(–wb2);border-radius:16px;padding:26px;width:100%;max-width:460px;max-height:90vh;overflow-y:auto;}
+.modal-h{font-size:20px;font-weight:700;margin-bottom:18px;color:#fff;}
+.f{margin-bottom:12px;}
+.f label{display:block;font-family:var(–mono);font-size:10px;color:var(–muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;}
+.f input,.f select{width:100%;background:var(–bg);border:1px solid var(–wb2);border-radius:7px;padding:9px 12px;color:var(–text);font-size:15px;transition:border-color .15s;}
+.f input:focus{border-color:var(–blue);}
+.btn-row{display:flex;gap:8px;margin-top:16px;}
+.btn-p{flex:1;padding:11px;border:none;border-radius:8px;background:var(–blue);color:#fff;font-weight:600;font-size:15px;}
+.btn-s{padding:11px 14px;border:1px solid var(–wb);border-radius:8px;background:transparent;color:var(–muted);font-size:15px;}
+
+/* SKELETON */
+.sk{height:15px;background:var(–s3);border-radius:4px;margin-bottom:9px;animation:sk 1.4s infinite;}
+.sk.s{width:55%;}
+@keyframes sk{0%,100%{opacity:.35;}50%{opacity:.8;}}
+@keyframes up{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.card,.bloc,.tl-card,.postit,.stat{animation:up .35s ease both;}
+</style>
+
+</head>
+<body>
+
+<!-- ═══ SHELL ═══ -->
+
+<div class="shell">
+
+<!-- SIDEBAR -->
+
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-eyebrow">Objectif · 24 mois</div>
+    <div class="sb-title">Chief Data Officer</div>
+    <div class="sb-date" id="sb-date">—</div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-sec">Navigation</div>
+    <button class="sbi active" onclick="nav('overview')"><span class="ico">◈</span> Vue d'ensemble</button>
+    <button class="sbi" onclick="nav('formations')"><span class="ico">📚</span> Formations</button>
+    <button class="sbi" onclick="nav('planning')"><span class="ico">🗓</span> Planning</button>
+    <button class="sbi" onclick="nav('news')"><span class="ico">📰</span> Actus IA</button>
+    <button class="sbi" onclick="nav('quiz')"><span class="ico">🧠</span> Quiz du jour</button>
+    <button class="sbi" onclick="nav('coach')"><span class="ico">⬡</span> AI Coach</button>
+    <button class="sbi" onclick="nav('projet')"><span class="ico">🏥</span> Projet Hospitalier</button>
+    <div class="sb-sec" style="margin-top:10px">Blocs</div>
+    <button class="sbi" onclick="nav('formations');later('b1')"><span class="sb-dot" style="background:#3d9bff"></span> B1 · Fondations</button>
+    <button class="sbi" onclick="nav('formations');later('b2')"><span class="sb-dot" style="background:#8b6fff"></span> B2 · Python & Data</button>
+    <button class="sbi" onclick="nav('formations');later('b3')"><span class="sb-dot" style="background:#00e096"></span> B3 · ML / IA</button>
+    <button class="sbi" onclick="nav('formations');later('b4')"><span class="sb-dot" style="background:#ff7c3d"></span> B4 · Leadership</button>
+    <button class="sbi" onclick="nav('formations');later('b5')"><span class="sb-dot" style="background:#06c8a0"></span> B5 · Blockchain</button>
+  </nav>
+  <div class="sb-bot">
+    <div class="sb-pct-lbl">Progression CDO</div>
+    <div class="sb-pct" id="sb-pct">0%</div>
+    <div class="sb-track"><div class="sb-fill" id="sb-fill" style="width:0%"></div></div>
+    <div class="sb-cnt" id="sb-cnt">0 / 0 formations</div>
+  </div>
+</aside>
+
+<!-- CONTENT -->
+
+<div class="content">
+  <header class="topbar">
+    <div class="tb-date" id="tb-date">—</div>
+    <div class="tb-right">
+      <div class="tb-pill">Budget : <strong id="tb-budget">—</strong></div>
+      <div class="pulse"></div>
+      <div style="font-family:var(--mono);font-size:12px;color:var(--muted)">CDO Track</div>
+    </div>
+  </header>
+
+  <div class="mob-nav">
+    <button class="mob-btn active" onclick="nav('overview')">◈ Vue</button>
+    <button class="mob-btn" onclick="nav('formations')">📚 Form.</button>
+    <button class="mob-btn" onclick="nav('planning')">🗓 Plan</button>
+    <button class="mob-btn" onclick="nav('news')">📰 Actus</button>
+    <button class="mob-btn" onclick="nav('quiz')">🧠 Quiz</button>
+    <button class="mob-btn" onclick="nav('coach')">⬡ Coach</button>
+    <button class="mob-btn" onclick="nav('projet')">🏥 Projet</button>
+  </div>
+
+  <main class="main">
+
+```
+<!-- ══ VUE D'ENSEMBLE ══ -->
+<div id="sec-overview" class="sec on">
+  <div class="tl-card">
+    <div class="tl-top">
+      <div>
+        <div class="tl-hero">De médecin gériatre à Chief Data Officer</div>
+        <div class="tl-sub">Départ 14 avril 2026 · 1h/jour · 5 blocs · 14 formations</div>
+      </div>
+      <div class="tl-pct" id="tl-pct">0%</div>
+    </div>
+    <div class="tl-track"><div class="tl-fill" id="tl-fill" style="width:0%"></div></div>
+    <div class="tl-ms">
+      <div class="tl-m" id="ms0">Fondations<br/>0%</div>
+      <div class="tl-m" id="ms1">Data Eng.<br/>25%</div>
+      <div class="tl-m" id="ms2">ML / IA<br/>50%</div>
+      <div class="tl-m" id="ms3">Leadership<br/>75%</div>
+      <div class="tl-m" id="ms4">CDO ✓<br/>100%</div>
+    </div>
+  </div>
+
+  <div class="postit">
+    <div class="pi-hd">
+      <div class="pi-tag">📌 Actu IA du jour</div>
+      <button class="pi-btn" onclick="loadPostit()">↻ Rafraîchir</button>
+    </div>
+    <div class="pi-text" id="pi-text">Chargement…</div>
+    <div class="pi-date" id="pi-date"></div>
+  </div>
+
+  <div class="stats4" id="stats4"></div>
+
+  <div class="card">
+    <div class="card-hd"><div class="card-ttl">Discipline · 7 derniers jours</div></div>
+    <div class="disc7" id="disc7"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd"><div class="card-ttl">Deadlines & inscriptions urgentes</div></div>
+    <div id="deadlines"></div>
+  </div>
+</div>
+
+<!-- ══ FORMATIONS ══ -->
+<div id="sec-formations" class="sec">
+  <div id="blocs-out"></div>
+  <div class="card">
+    <div class="card-hd"><div class="card-ttl">💰 Budget récapitulatif</div></div>
+    <div id="budget-out"></div>
+  </div>
+</div>
+
+<!-- ══ PLANNING ══ -->
+<div id="sec-planning" class="sec">
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-ttl">Semaine en cours</div>
+      <button class="card-act" onclick="openBlkModal()">+ Bloc</button>
+    </div>
+    <div class="week7" id="week7"></div>
+    <div class="card-hd" style="margin-top:4px;margin-bottom:12px;">
+      <div class="card-ttl" id="day-lbl">Aujourd'hui</div>
+    </div>
+    <div id="blks-out"></div>
+  </div>
+</div>
+
+<!-- ══ ACTUS IA ══ -->
+<div id="sec-news" class="sec">
+  <div class="nl-paste">
+    <div class="card-hd" style="margin-bottom:12px">
+      <div class="card-ttl">✂️ Coller une newsletter → résumé IA</div>
+    </div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:10px;font-family:var(--mono)">Copiez le texte d'une newsletter reçue → Claude en extrait les 3 points clés pour votre post-it.</p>
+    <textarea class="nl-ta" id="nl-input" placeholder="Collez ici le texte de votre newsletter (The Batch, TLDR, Import AI…)" rows="4"></textarea>
+    <button class="sum-btn" id="sum-btn" onclick="summarizeNl()">✦ Résumer en post-it</button>
+    <div class="sum-res" id="sum-res"></div>
+  </div>
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-ttl">Brèves IA · Santé & Data</div>
+      <button class="card-act" onclick="newsLoaded=false;loadNews()">↻ Actualiser</button>
+    </div>
+    <div id="news-out"><div class="sk"></div><div class="sk s"></div><div class="sk"></div></div>
+  </div>
+  <div class="card">
+    <div class="card-hd"><div class="card-ttl">📬 Mes newsletters</div></div>
+    <div class="nl-grid">
+      <a href="https://www.deeplearning.ai/the-batch/" target="_blank" class="nl-card"><div class="nl-ico">🤖</div><div class="nl-name">The Batch</div><div class="nl-desc">Andrew Ng · DeepLearning.AI</div><div class="nl-url">deeplearning.ai →</div></a>
+      <a href="https://importai.substack.com/" target="_blank" class="nl-card"><div class="nl-ico">📡</div><div class="nl-name">Import AI</div><div class="nl-desc">Jack Clark · recherche IA</div><div class="nl-url">importai.substack.com →</div></a>
+      <a href="https://www.tldr.tech/ai" target="_blank" class="nl-card"><div class="nl-ico">⚡</div><div class="nl-name">TLDR AI</div><div class="nl-desc">Résumé quotidien IA & tech</div><div class="nl-url">tldr.tech/ai →</div></a>
+      <a href="https://www.healthcareitnews.com/" target="_blank" class="nl-card"><div class="nl-ico">🏥</div><div class="nl-name">Healthcare IT News</div><div class="nl-desc">IA & données de santé</div><div class="nl-url">healthcareitnews.com →</div></a>
+      <a href="https://www.exponentialview.co/" target="_blank" class="nl-card"><div class="nl-ico">🌐</div><div class="nl-name">Exponential View</div><div class="nl-desc">Azeem Azhar · IA & société</div><div class="nl-url">exponentialview.co →</div></a>
+      <a href="https://datascienceweekly.org/" target="_blank" class="nl-card"><div class="nl-ico">📊</div><div class="nl-name">Data Science Weekly</div><div class="nl-desc">Ressources & actus data</div><div class="nl-url">datascienceweekly.org →</div></a>
+    </div>
+  </div>
+</div>
+
+<!-- ══ QUIZ ══ -->
+<div id="sec-quiz" class="sec">
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-ttl">🧠 Test de connaissances</div>
+      <button class="card-act" onclick="loadQuiz(true)">↻ Nouveau</button>
+    </div>
+    <div class="quiz-score" id="quiz-score" style="display:none"></div>
+    <div id="quiz-out"><div class="sk"></div><div class="sk s"></div></div>
+  </div>
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-ttl">💻 Défi Python du jour</div>
+      <button class="card-act" onclick="loadCode(true)">↻ Nouveau</button>
+    </div>
+    <div id="code-q" style="font-size:15px;font-weight:600;color:#fff;margin-bottom:10px;line-height:1.5"><div class="sk"></div></div>
+    <textarea class="code-area" id="code-in" placeholder="# Écrivez votre code Python ici…" rows="5" spellcheck="false"></textarea>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
+      <button class="run-btn" onclick="checkCode()">▶ Vérifier</button>
+      <span style="font-family:var(--mono);font-size:12px;color:var(--muted)">Vérification pédagogique</span>
+    </div>
+    <div class="code-out" id="code-out" style="display:none"></div>
+  </div>
+</div>
+
+<!-- ══ COACH ══ -->
+<div id="sec-coach" class="sec">
+  <div class="card">
+    <div class="card-hd"><div class="card-ttl">⬡ AI Coach · Strict & Exigeant</div></div>
+    <p style="font-size:13px;color:var(--muted);font-family:var(--mono);margin-bottom:12px">Collez votre plan du jour → analyse des priorités, procrastination détectée, planning optimisé.</p>
+    <textarea class="coach-ta" id="coach-in" placeholder="Ex: 9h-11h Google Analytics module 2 · 11h Stanford CIP exercices · 14h-16h lecture PMSI…"></textarea>
+    <button class="ana-btn" id="ana-btn" onclick="analyzeDay()">⬡ Analyser & optimiser mon plan</button>
+    <div id="coach-out"></div>
+  </div>
+</div>
+
+<!-- ══ PROJET HOSPITALIER ══ -->
+<div id="sec-projet" class="sec">
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-ttl">🏥 Projet Hospitalier · Notes libres</div>
+      <button class="card-act" onclick="saveProjet()">💾 Sauvegarder</button>
+    </div>
+    <p style="font-size:13px;color:var(--muted);font-family:var(--mono);margin-bottom:16px">Espace libre : idées, contacts, objectifs, avancement de votre projet data en milieu hospitalier.</p>
+    <input class="proj-input" id="proj-title" placeholder="Titre du projet — ex: Entrepôt données gériatriques CHU Lyon"/>
+    <textarea class="proj-ta" id="proj-notes"
+      placeholder="Écrivez librement ici…&#10;&#10;💡 Idées :&#10;— Analyse PMSI pour réduire les réadmissions&#10;— Dashboard suivi indicateurs qualité gériatrie&#10;&#10;📋 Contacts :&#10;— DSI de l'établissement&#10;— Responsable DIM&#10;&#10;📅 Prochaines étapes :&#10;— …"></textarea>
+    <div id="proj-saved" style="font-family:var(--mono);font-size:12px;color:var(--green);margin-top:10px;display:none">✓ Sauvegardé</div>
+  </div>
+</div>
+```
+
+  </main>
+</div><!-- fin .content -->
+</div><!-- fin .shell -->
+
+<!-- ═══ POST-IT ROSE — HORS DE TOUT CONTENEUR ═══ -->
+
+<div id="pp-btn" onclick="togglePP()"
+  style="position:fixed;right:0;top:45%;transform:translateY(-50%);
+    background:#fce4ec;border:2px solid #f48fb1;border-right:none;
+    border-radius:10px 0 0 10px;padding:14px 9px;cursor:pointer;
+    writing-mode:vertical-rl;font-family:'DM Mono',monospace;font-size:12px;
+    font-weight:600;color:#c2185b;letter-spacing:.12em;text-transform:uppercase;
+    box-shadow:-4px 0 20px rgba(194,24,91,.3);z-index:99999;">
+  📝 Notes
+</div>
+<div id="pp-panel"
+  style="position:fixed;right:0;top:50%;transform:translateY(-50%);
+    width:300px;background:#fce4ec;border:2px solid #f48fb1;border-right:none;
+    border-radius:16px 0 0 16px;padding:20px;
+    box-shadow:-6px 0 32px rgba(194,24,91,.35);z-index:99999;
+    display:none;flex-direction:column;gap:12px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;">
+    <div style="font-family:'DM Mono',monospace;font-size:11px;font-weight:700;color:#880e4f;text-transform:uppercase;letter-spacing:.14em;">📝 Notes rapides</div>
+    <button onclick="togglePP()" style="background:rgba(194,24,91,.12);border:1px solid #f48fb1;border-radius:6px;color:#c2185b;font-size:18px;cursor:pointer;width:28px;height:28px;display:flex;align-items:center;justify-content:center;">×</button>
+  </div>
+  <textarea id="pp-notes" oninput="savePP()"
+    style="background:rgba(255,255,255,.72);border:1px solid #f48fb1;border-radius:8px;
+      padding:12px;color:#3e0018;font-size:14px;resize:none;min-height:240px;
+      line-height:1.8;font-family:'DM Sans',sans-serif;"
+    placeholder="Notes rapides…&#10;— À faire aujourd'hui&#10;— Questions pour le DIM&#10;— Idée de projet data&#10;— Vocabulaire&#10;…"></textarea>
+  <div style="font-family:'DM Mono',monospace;font-size:10px;color:#c2185b;text-align:right;">✓ Sauvegarde automatique</div>
+</div>
+
+<!-- ═══ MODALE PLANNING ═══ -->
+
+<div class="overlay" id="blk-modal" style="display:none" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal">
+    <div class="modal-h">Planifier un bloc</div>
+    <div class="f"><label>Titre</label><input id="bl-t" placeholder="ex: Deep Work · Google Analytics"/></div>
+    <div class="f"><label>Date</label><input id="bl-d" type="date"/></div>
+    <div class="f"><label>Heure</label><input id="bl-h" type="time" value="09:00"/></div>
+    <div class="f"><label>Durée (min)</label><input id="bl-dur" type="number" value="90" min="30"/></div>
+    <div class="f"><label>Type</label>
+      <select id="bl-type">
+        <option value="deep">🟣 Deep Work</option>
+        <option value="review">🔵 Review</option>
+        <option value="project">🟠 Projet</option>
+        <option value="read">🟢 Lecture</option>
+      </select>
+    </div>
+    <div class="btn-row">
+      <button class="btn-s" onclick="document.getElementById('blk-modal').style.display='none'">Annuler</button>
+      <button class="btn-p" onclick="addBlock()">Planifier</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══ STORAGE ══
+const G=k=>{try{return JSON.parse(localStorage.getItem('cdo6_'+k));}catch{return null;}};
+const W=(k,v)=>localStorage.setItem('cdo6_'+k,JSON.stringify(v));
+const DAYS=['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+const MONTHS=['janv','févr','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'];
+const BCOL={deep:'#8b6fff',review:'#3d9bff',project:'#ff7c3d',read:'#00e096'};
+const SL={a_faire:'À faire',en_cours:'En cours',fait:'Terminé ✓'};
+const SN={a_faire:'en_cours',en_cours:'fait',fait:'a_faire'};
+function today(){return new Date().toISOString().split('T')[0];}
+
+// ══ DONNÉES FORMATIONS ══
+const BLOCS=[
+  {id:'b1',num:'B1',name:'Fondations · Data & Culture Numérique',color:'#3d9bff',formations:[
+    {id:'goog-da',title:'Google Data Analytics Certificate',provider:'Coursera · Google',
+      url:'https://www.coursera.org/professional-certificates/google-data-analytics',
+      applyDate:'Inscription immédiate',applyUrgent:true,start:'14 avril 2026',end:'oct. 2026',
+      hours:180,weeks:26,budget:'Inclus Coursera+ (205€/an)',budgetN:0,status:'en_cours',
+      note:'POINT D\'ENTRÉE. SQL, Tableau, R basique, analyse de données réelles. Certification Google reconnue mondialement. Commencer aujourd\'hui.',
+      subs:['Course 1 · Foundations: Data, Data, Everywhere','Course 2 · Ask Questions to Make Data-Driven Decisions','Course 3 · Prepare Data for Exploration','Course 4 · Process Data from Dirty to Clean','Course 5 · Analyze Data to Answer Questions','Course 6 · Share Data Through the Art of Visualization','Course 7 · Data Analysis with R Programming','Course 8 · Google Data Analytics Capstone Project']},
+    {id:'stan-cip',title:'Stanford Code in Place',provider:'Stanford University · Gratuit',
+      url:'https://codeinplace.stanford.edu/',
+      applyDate:'Candidature en cours',applyUrgent:false,start:'23 avril 2026',end:'5 juin 2026',
+      hours:25,weeks:6,budget:'Gratuit',budgetN:0,status:'en_cours',
+      note:'Cours Python en direct tous les jeudis à 14h pendant 6 semaines. Début : 23 avril 2026.',subs:[]},
+    {id:'harv-cs50',title:'Harvard CS50 – Introduction to Computer Science',provider:'Harvard · edX',
+      url:'https://cs50.harvard.edu/x/',
+      applyDate:'Inscription libre',applyUrgent:false,start:'Après Google DA',end:'2027',
+      hours:100,weeks:15,budget:'Gratuit / ~140€ certificat',budgetN:140,status:'a_faire',
+      note:'Culture informatique fondamentale. Algorithmes, mémoire, web. Harvard crédibilise le CV.',subs:[]},
+  ]},
+  {id:'b2',num:'B2',name:'Python · Data Engineering & Analytics',color:'#8b6fff',formations:[
+    {id:'py-ev',title:'Python for Everybody – Spécialisation',provider:'Coursera · University of Michigan',
+      url:'https://www.coursera.org/specializations/python',
+      applyDate:'Inscription libre',applyUrgent:false,start:'mai 2026',end:'août 2026',
+      hours:40,weeks:14,budget:'Inclus Coursera+ (205€/an)',budgetN:0,status:'a_faire',
+      note:'Fondations Python : variables, fonctions, structures de données. Spécialisation complète en 5 cours.',subs:[]},
+    {id:'sql-uc',title:'SQL for Data Science',provider:'Coursera · UC Davis',
+      url:'https://www.coursera.org/learn/sql-for-data-science',
+      applyDate:'Inscription libre',applyUrgent:false,start:'juin 2026',end:'juil. 2026',
+      hours:25,weeks:4,budget:'Inclus Coursera+ (205€/an)',budgetN:0,status:'a_faire',
+      note:'SQL appliqué aux bases de données hospitalières : PMSI, entrepôts de santé.',subs:[]},
+    {id:'du-phds',title:'DU PHDS – Population Health Data Science',provider:'ISPED · Université de Bordeaux',
+      url:'https://www.isped.u-bordeaux.fr/',
+      applyDate:'1er mai 2026 ⚠️',applyUrgent:true,start:'13 oct. 2026',end:'juin 2027',
+      hours:180,weeks:36,budget:'1 300€',budgetN:1300,status:'a_faire',
+      note:'PIÈCE CENTRALE. Seul diplôme académique français dédié aux données de santé. Épidémiologie, biostatistiques, PMSI, SNDS, éthique.',
+      subs:['Module 1 · Digital tools for data sciences — 30h','Module 2 · Fundamentals of health informatics — 45h','Module 3 · Fundamentals of epidemiology — 40h','Module 4 · Fundamentals of biostatistics — 45h','Module 5 · Ethical & regulatory aspects — 20h']},
+  ]},
+  {id:'b3',num:'B3',name:'Machine Learning & IA',color:'#00e096',formations:[
+    {id:'ai-ev',title:'AI for Everyone',provider:'Coursera · DeepLearning.AI · Andrew Ng',
+      url:'https://www.coursera.org/learn/ai-for-everyone',
+      applyDate:'Inscription libre',applyUrgent:false,start:'oct. 2026',end:'oct. 2026',
+      hours:6,weeks:1,budget:'Inclus Coursera+ (205€/an)',budgetN:0,status:'a_faire',
+      note:'Pour dirigeants et non-techniciens. À faire AVANT Stanford ML. 6h — impact/heure maximal.',subs:[]},
+    {id:'stan-ml',title:'Machine Learning Specialization – Andrew Ng',provider:'Coursera · Stanford',
+      url:'https://www.coursera.org/specializations/machine-learning-introduction',
+      applyDate:'Inscription libre',applyUrgent:false,start:'juil. 2027',end:'sept. 2027',
+      hours:60,weeks:9,budget:'Inclus Coursera+ (205€/an)',budgetN:0,status:'a_faire',
+      note:'Référence mondiale. Comprendre le ML pour challenger vos équipes et piloter les projets IA santé.',subs:[]},
+    {id:'llm-lc',title:'LangChain & LLM Apps',provider:'DeepLearning.AI · Short Courses',
+      url:'https://learn.deeplearning.ai/',
+      applyDate:'Inscription libre',applyUrgent:false,start:'oct. 2027',end:'nov. 2027',
+      hours:25,weeks:4,budget:'Gratuit à ~45€',budgetN:45,status:'a_faire',
+      note:'LLMs appliqués à la santé. En 2027 un CDO qui ne comprend pas les LLMs est en retard.',subs:[]},
+  ]},
+  {id:'b4',num:'B4',name:'Leadership & Stratégie Data',color:'#ff7c3d',formations:[
+    {id:'cdmp',title:'CDMP Foundation – Data Management Professional',provider:'DAMA International',
+      url:'https://www.dama.org/cpages/body-of-knowledge',
+      applyDate:'Inscription libre',applyUrgent:false,start:'déc. 2027',end:'fév. 2028',
+      hours:40,weeks:8,budget:'~300€',budgetN:300,status:'a_faire',
+      note:'Certification internationale en gouvernance des données. Distingue "manager data" de "CDO légitime".',subs:[]},
+    {id:'mba',title:'MBA / Master · Leadership & Transformation Data',provider:'HEC Executive, ESSEC, emlyon…',
+      url:'#',applyDate:'Décision fin 2027',applyUrgent:false,start:'2028',end:'2029',
+      hours:null,weeks:null,budget:'FIFPL / employeur',budgetN:0,status:'a_faire',
+      note:'Réseau C-suite et légitimité dirigeante. Profil médecin+data = atout réel pour HEC Executive.',subs:[]},
+  ]},
+  {id:'b5',num:'B5',name:'Blockchain & Web3 · Santé',color:'#06c8a0',formations:[
+    {id:'fun-bc',title:'MOOC Blockchain & Santé',provider:'FUN MOOC · France Université Numérique',
+      url:'https://www.fun-mooc.fr/',
+      applyDate:'Vérifier les sessions',applyUrgent:false,start:'2027',end:'2027',
+      hours:10,weeks:3,budget:'Gratuit',budgetN:0,status:'a_faire',
+      note:'À faire EN PREMIER. Cas d\'usage santé en français : dossier patient partagé, traçabilité médicament (directive EU), consentement horodaté. Intervenants hospitaliers français.',subs:[]},
+    {id:'mit-bc',title:'Blockchain and Money — Gary Gensler',provider:'MIT OpenCourseWare · Gratuit',
+      url:'https://ocw.mit.edu/courses/15-s12-blockchain-and-money-fall-2018/',
+      applyDate:'Disponible en ligne',applyUrgent:false,start:'2027',end:'2027',
+      hours:15,weeks:4,budget:'Gratuit',budgetN:0,status:'a_faire',
+      note:'Vision stratégique par l\'ex-président de la SEC. Gouvernance, réglementation, décision d\'investissement. MIT crédibilise le parcours.',subs:[]},
+    {id:'crs-bc',title:'Blockchain Basics',provider:'Coursera · University at Buffalo',
+      url:'https://www.coursera.org/learn/blockchain-basics',
+      applyDate:'Inscription libre',applyUrgent:false,start:'2027',end:'2027',
+      hours:12,weeks:4,budget:'Inclus Coursera+ (205€/an)',budgetN:0,status:'a_faire',
+      note:'Fondamentaux techniques accessibles sans background développeur. Protocoles et smart contracts.',subs:[]},
+  ]},
+];
+
+// ══ STATE ══
+function getSt(){try{return JSON.parse(localStorage.getItem('cdo6_st')||'{}');}catch{return{};}}
+function saveSt(id,s){const a=getSt();a[id]=s;localStorage.setItem('cdo6_st',JSON.stringify(a));}
+let blocks=G('blocks')||[
+  {id:1,title:'Deep Work · Google Analytics Module 1',date:today(),time:'09:00',dur:90,type:'deep'},
+  {id:2,title:'Review · Stanford Code in Place',date:today(),time:'11:00',dur:60,type:'review'},
+  {id:3,title:'Deep Work · Exercices pratiques',date:today(),time:'14:00',dur:90,type:'deep'},
+];
+let streak=G('streak')||{days:[]};
+let selDay=today();
+let newsLoaded=false,quizLoaded=false,quizAnswered=false,codeLoaded=false,codeIdx=0,quizIdx=0;
+let quizScore={right:0,total:0};
+
+// ══ INIT ══
+function init(){
+  const now=new Date();
+  const ds=`${DAYS[now.getDay()]} ${now.getDate()} ${MONTHS[now.getMonth()]} ${now.getFullYear()}`;
+  ['tb-date','sb-date'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=ds;});
+  renderAll();
+  loadPostit();
+  loadPP();
+  loadProjetData();
+}
+
+function renderAll(){
+  updateProg();renderStats();renderDisc();renderDeadlines();
+  renderBlocs();renderBudget();renderPlanning();
+}
+
+// ══ PROGRESSION ══
+function allF(){return BLOCS.flatMap(b=>b.formations);}
+function calcPct(){
+  const st=getSt(),all=allF();
+  if(!all.length)return 0;
+  return Math.round(all.filter(f=>(st[f.id]||f.status)==='fait').length/all.length*100);
+}
+function updateProg(){
+  const p=calcPct();
+  ['tl-pct','sb-pct'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=p+'%';});
+  ['tl-fill','sb-fill'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.width=p+'%';});
+  const st=getSt(),done=allF().filter(f=>(st[f.id]||f.status)==='fait').length;
+  const sc=document.getElementById('sb-cnt');if(sc)sc.textContent=`${done} / ${allF().length} formations`;
+  const tot=BLOCS.flatMap(b=>b.formations).reduce((a,f)=>a+(f.budgetN||0),0)+205;
+  const tb=document.getElementById('tb-budget');if(tb)tb.textContent=tot.toLocaleString('fr-FR')+'€';
+  [0,25,50,75,100].forEach((t,i)=>document.getElementById('ms'+i)?.classList.toggle('done',p>=t));
+}
+
+// ══ STATS ══
+function renderStats(){
+  const st=getSt(),all=allF();
+  const doing=all.filter(f=>(st[f.id]||f.status)==='en_cours').length;
+  const done=all.filter(f=>(st[f.id]||f.status)==='fait').length;
+  const urg=all.filter(f=>(st[f.id]||f.status)!=='fait'&&f.applyUrgent).length;
+  const s7=streak.days?.filter(d=>(new Date()-new Date(d))<=7*864e5).length||0;
+  document.getElementById('stats4').innerHTML=[
+    {n:doing,l:'En cours',c:'var(--orange)'},{n:done,l:'Terminées',c:'var(--green)'},
+    {n:urg,l:'Inscriptions urgentes',c:'var(--red)'},{n:s7+'🔥',l:'Jours streak',c:'var(--gold)'},
+  ].map(d=>`<div class="stat"><div class="stat-n" style="color:${d.c}">${d.n}</div><div class="stat-l">${d.l}</div><div class="stat-bar" style="background:${d.c}"></div></div>`).join('');
+}
+
+// ══ DISCIPLINE ══
+function renderDisc(){
+  const now=new Date();let h='';
+  for(let i=6;i>=0;i--){
+    const d=new Date(now);d.setDate(d.getDate()-i);
+    const ds=d.toISOString().split('T')[0];
+    const done=streak.days?.includes(ds),isT=ds===today();
+    h+=`<div class="disc-d ${done?'done':''} ${isT?'today':''}" onclick="toggleStreak('${ds}')">
+      <div class="disc-dn">${DAYS[d.getDay()]}</div><div class="disc-num">${d.getDate()}</div>
+      <div class="disc-ck">${done?'✅':isT?'⬜':'·'}</div></div>`;
+  }
+  document.getElementById('disc7').innerHTML=h;
+}
+function toggleStreak(ds){
+  if(!streak.days)streak.days=[];
+  const i=streak.days.indexOf(ds);
+  if(i>-1)streak.days.splice(i,1);else streak.days.push(ds);
+  W('streak',streak);renderDisc();renderStats();
+}
+
+// ══ DEADLINES ══
+function renderDeadlines(){
+  const st=getSt(),el=document.getElementById('deadlines');
+  const list=allF().filter(f=>(st[f.id]||f.status)!=='fait'&&(f.applyUrgent||f.start)).slice(0,6);
+  if(!list.length){el.innerHTML='<div style="color:var(--muted);font-family:var(--mono);font-size:13px">Aucune deadline imminente</div>';return;}
+  el.innerHTML=list.map(f=>{
+    const col=f.applyUrgent?'var(--red)':'var(--orange)';
+    const badge=f.applyUrgent?'⚠ URGENT':'Planifiée';
+    return `<div class="dl-row"><div class="dl-stripe" style="background:${col}"></div>
+      <div style="flex:1;min-width:0"><div class="dl-name">${f.title}</div><div class="dl-date">${f.applyUrgent?f.applyDate:f.start}</div></div>
+      <div class="dl-badge" style="background:${col}18;color:${col};border:1px solid ${col}33">${badge}</div></div>`;
+  }).join('');
+}
+
+// ══ BLOCS ══
+function renderBlocs(){
+  const st=getSt(),out=document.getElementById('blocs-out');
+  out.innerHTML='';
+  BLOCS.forEach(bloc=>{
+    const done=bloc.formations.filter(f=>(st[f.id]||f.status)==='fait').length;
+    const p=Math.round(done/bloc.formations.length*100);
+    const div=document.createElement('div');
+    div.className='bloc';div.id=bloc.id;
+    div.innerHTML=`<div class="bloc-hd">
+      <span class="bloc-badge" style="background:${bloc.color};color:#08090e">${bloc.num}</span>
+      <span class="bloc-name">${bloc.name}</span>
+      <span class="bloc-meta">${done}/${bloc.formations.length} · ${p}%</span></div>
+      <div class="bloc-pb"><div class="bloc-pf" style="width:${p}%;background:${bloc.color}"></div></div>
+      <div class="bloc-body" id="bb-${bloc.id}"></div>`;
+    out.appendChild(div);
+
+    const body=document.getElementById('bb-'+bloc.id);
+    bloc.formations.forEach(f=>{
+      const s=st[f.id]||f.status;
+      const subsKey='subs_'+f.id;
+      const subsOk=G(subsKey)||[];
+      // Progression : basée sur sous-étapes si présentes, sinon statut
+      let fp=0;
+      if(f.subs.length>0){fp=Math.round(subsOk.length/f.subs.length*100);}
+      else{fp=s==='fait'?100:s==='en_cours'?10:0;}
+
+      const subsHtml=f.subs.length?`
+        <div style="margin-bottom:12px">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px">
+            Étapes · ${subsOk.length}/${f.subs.length} complétées</div>
+          ${f.subs.map((sub,i)=>{
+            const chk=subsOk.includes(i);
+            return `<div class="sub-step" onclick="toggleSub('${f.id}',${i})" style="${chk?'opacity:.6':''}">
+              <div class="sub-check ${chk?'done':''}">${chk?'<span style="color:#08090e;font-size:11px;font-weight:700">✓</span>':''}</div>
+              <span class="sub-label ${chk?'done':''}">${sub}</span></div>`;
+          }).join('')}</div>`:'';
+
+      const fc=document.createElement('div');fc.className='fcard';
+      fc.innerHTML=`
+        <div class="fc-top">
+          <div><div class="fc-title">${f.title}</div><div class="fc-prov">${f.provider}</div></div>
+          <div class="fc-right">
+            <span class="s-badge ${s}" data-id="${f.id}">${SL[s]}</span>
+            ${f.url!=='#'?`<a class="fc-link" href="${f.url}" target="_blank">→ Accéder</a>`:''}
+          </div>
+        </div>
+        <div style="margin-bottom:14px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+            <div style="font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em">Avancement</div>
+            <div style="font-family:var(--mono);font-size:13px;font-weight:700;color:${bloc.color}">${fp}%</div>
+          </div>
+          <div style="height:7px;background:var(--s3);border-radius:4px;overflow:hidden">
+            <div style="height:100%;width:${fp}%;background:${bloc.color};border-radius:4px;transition:width .6s ease"></div>
+          </div>
+        </div>
+        <div class="fc-grid">
+          <div><div class="fc-fl">Inscription</div><div class="fc-fv ${f.applyUrgent?'urg':''}">${f.applyDate}</div></div>
+          <div><div class="fc-fl">Début</div><div class="fc-fv">${f.start}</div></div>
+          <div><div class="fc-fl">Fin</div><div class="fc-fv">${f.end}</div></div>
+          <div><div class="fc-fl">Durée</div><div class="fc-fv">${f.hours?f.hours+'h':'—'}${f.weeks?' · '+f.weeks+' sem.':''}</div></div>
+          <div><div class="fc-fl">Budget</div><div class="fc-fv bgt">${f.budget}</div></div>
+        </div>
+        ${subsHtml}
+        <div class="fc-note">${f.note}</div>`;
+      body.appendChild(fc);
+    });
+  });
+
+  document.querySelectorAll('.s-badge[data-id]').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const id=b.dataset.id,cur=b.className.match(/a_faire|en_cours|fait/)?.[0]||'a_faire';
+      saveSt(id,SN[cur]);renderBlocs();updateProg();renderStats();renderDeadlines();
+    });
+  });
+}
+
+function toggleSub(fid,idx){
+  const key='subs_'+fid,ok=G(key)||[];
+  const i=ok.indexOf(idx);
+  if(i>-1)ok.splice(i,1);else ok.push(idx);
+  W(key,ok);renderBlocs();updateProg();
+}
+
+// ══ BUDGET ══
+function renderBudget(){
+  const all=allF();
+  const extra=all.filter(f=>f.budgetN>0).reduce((a,f)=>a+f.budgetN,0);
+  const total=extra+205;
+  document.getElementById('budget-out').innerHTML=
+    `<div class="bgt-row" style="border-left:3px solid var(--blue);padding-left:10px">
+      <span>📚 <strong>Coursera+</strong> <span style="font-size:11px;color:var(--muted)">(Google DA, Python, SQL, AI for Everyone, Stanford ML, Blockchain Basics…)</span></span>
+      <span class="a">205€ / an</span></div>`+
+    all.filter(f=>f.budgetN>0).map(f=>`<div class="bgt-row"><span>${f.title}</span><span class="a">${f.budgetN.toLocaleString('fr-FR')}€</span></div>`).join('')+
+    all.filter(f=>f.budgetN===0&&!['goog-da','py-ev','sql-uc','ai-ev','stan-ml','crs-bc'].includes(f.id)).map(f=>`<div class="bgt-row"><span>${f.title}</span><span class="f">Gratuit</span></div>`).join('')+
+    `<div class="bgt-total"><span>Total estimé</span><span class="a">${total.toLocaleString('fr-FR')}€</span></div>
+     <p style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:10px">* MBA/Master hors budget (FIFPL / employeur possible)</p>`;
+}
+
+// ══ PLANNING ══
+function renderPlanning(){renderWeek();renderDayBlocks();}
+function renderWeek(){
+  const now=new Date(),dow=now.getDay();let h='';
+  for(let i=0;i<7;i++){
+    const d=new Date(now);d.setDate(d.getDate()-dow+i);
+    const ds=d.toISOString().split('T')[0];
+    const isT=ds===today(),isSel=ds===selDay,hasB=blocks.some(b=>b.date===ds);
+    h+=`<div class="wday ${isT?'today':''} ${isSel?'sel':''}" onclick="selDay='${ds}';updateDayLbl();renderWeek();renderDayBlocks()">
+      <div class="wd-n">${DAYS[i]}</div>
+      <div class="wd-d" style="color:${isT?'var(--blue)':''}">${d.getDate()}</div>
+      ${hasB?'<div class="wd-dot"></div>':'<div style="height:9px"></div>'}
+    </div>`;
+  }
+  document.getElementById('week7').innerHTML=h;
+}
+function updateDayLbl(){
+  const d=new Date(selDay);
+  document.getElementById('day-lbl').textContent=`${DAYS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]}`;
+}
+function renderDayBlocks(){
+  const el=document.getElementById('blks-out');
+  const list=[...blocks].filter(b=>b.date===selDay).sort((a,b)=>a.time.localeCompare(b.time));
+  if(!list.length){el.innerHTML='<div style="color:var(--muted);font-family:var(--mono);font-size:13px;padding:14px 0;text-align:center">Aucun bloc ce jour — cliquez + Bloc</div>';return;}
+  el.innerHTML=list.map(b=>{
+    const idx=blocks.indexOf(b),col=BCOL[b.type]||'#8b6fff';
+    return `<div class="blk" style="border-left-color:${col}">
+      <div class="blk-time">${b.time}</div>
+      <div style="flex:1"><div class="blk-title">${b.title}</div><div class="blk-sub">${b.dur} min</div>
+      ${b.type==='deep'?'<span class="deep-tag">DEEP WORK</span>':''}</div>
+      <button onclick="blocks.splice(${idx},1);W('blocks',blocks);renderDayBlocks();renderWeek();"
+        style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;margin-left:auto;">✕</button>
+    </div>`;
+  }).join('');
+}
+function openBlkModal(){document.getElementById('bl-d').value=selDay;document.getElementById('blk-modal').style.display='flex';}
+function addBlock(){
+  const t=document.getElementById('bl-t').value.trim();if(!t)return;
+  blocks.push({id:Date.now(),title:t,date:document.getElementById('bl-d').value||today(),
+    time:document.getElementById('bl-h').value,dur:document.getElementById('bl-dur').value,
+    type:document.getElementById('bl-type').value});
+  W('blocks',blocks);document.getElementById('blk-modal').style.display='none';
+  renderWeek();renderDayBlocks();document.getElementById('bl-t').value='';
+}
+
+// ══ POST-IT JAUNE ══
+const PI_STATIC=[
+  "🏥 L'IA générative s'intègre dans les entrepôts de santé : les CHU pilotent des LLMs pour interroger le PMSI en langage naturel.",
+  "📊 Le SNDS ouvre de nouveaux accès chercheurs en 2026 — opportunité clé pour les futurs CDO santé.",
+  "🔬 Nature Medicine : un modèle IA prédit les réadmissions à 30 jours avec 89% de précision sur données EHR.",
+  "⚖️ AI Act : les algorithmes de triage aux urgences classés haut risque — implications directes pour les CDO hospitaliers.",
+  "💡 McKinsey 2026 : les organisations de santé avec un CDO réduisent leurs coûts de 18%.",
+  "🧬 DeepMind & NHS : partenariat data pour prédire les sepsis 6h avant les signes cliniques.",
+  "📈 Gartner : 70% des DSI hospitaliers prévoient de créer un poste de CDO d'ici 2027.",
+];
+async function loadPostit(){
+  const el=document.getElementById('pi-text'),dt=document.getElementById('pi-date');
+  el.textContent='Chargement…';
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:200,
+        messages:[{role:'user',content:`Génère UNE actu IA/Data santé percutante en français, style post-it. 2 phrases max. Pour médecin gériatre reconvertie CDO. Direct, sans titre. ${new Date().toLocaleDateString('fr-FR')}`}]})});
+    const d=await r.json();
+    const t=d.content?.map(b=>b.text||'').join('');
+    if(t&&t.length>10){el.textContent=t;dt.textContent='✦ Généré par Claude · '+new Date().toLocaleDateString('fr-FR');return;}
+  }catch(e){}
+  const h=PI_STATIC[new Date().getDay()%PI_STATIC.length];
+  el.textContent=h;dt.textContent='✦ Actu · '+new Date().toLocaleDateString('fr-FR');
+}
+
+// ══ RÉSUMÉ NEWSLETTER ══
+async function summarizeNl(){
+  const text=document.getElementById('nl-input').value.trim();
+  if(!text){alert('Collez d\'abord le texte de votre newsletter.');return;}
+  const btn=document.getElementById('sum-btn'),res=document.getElementById('sum-res');
+  btn.disabled=true;btn.textContent='⟳ Résumé en cours…';
+  res.style.display='block';res.innerHTML='<span style="color:#8a7000;font-family:var(--mono);font-size:13px">Analyse…</span>';
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,
+        messages:[{role:'user',content:`Médecin gériatre en reconversion CDO santé. Extrais les 3 points les plus pertinents de cette newsletter pour sa reconversion. 3 bullet points courts, emoji devant chaque, en français.\n\n${text.substring(0,3000)}`}]})});
+    const d=await r.json();
+    const s=d.content?.map(b=>b.text||'').join('')||'Impossible de résumer.';
+    res.innerHTML=`<div style="font-weight:600;margin-bottom:8px;color:#5a4400;font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.12em">✦ Points clés pour votre reconversion CDO</div>${s.replace(/\n/g,'<br/>')}`;
+    document.getElementById('pi-text').textContent=s.split('\n')[0]||s;
+    document.getElementById('pi-date').textContent='✦ Résumé newsletter · '+new Date().toLocaleDateString('fr-FR');
+  }catch(e){res.innerHTML='<div style="color:var(--red)">Erreur : API disponible depuis Claude.ai uniquement.</div>';}
+  btn.disabled=false;btn.innerHTML='✦ Résumer en post-it';
+}
+
+// ══ NEWS ══
+const NEWS=[
+  {title:'L\'IA dans les soins : état des lieux 2026',url:'https://www.healthcareitnews.com/',sum:'Les CDO de santé deviennent les pivots stratégiques entre innovation IA et gouvernance des données cliniques.',tag:'CDO Santé'},
+  {title:'SNDS & PMSI : les entrepôts de données de santé français',url:'https://www.snds.gouv.fr/',sum:'Le SNDS couvre 99% de la population. Maîtriser ces sources est un prérequis pour tout CDO en santé en France.',tag:'Data Santé'},
+  {title:'LLMs en médecine : promesses et limites',url:'https://www.nature.com/nm',sum:'L\'enjeu n\'est pas l\'IA seule, mais son intégration dans les workflows cliniques via une gouvernance solide.',tag:'LLM'},
+  {title:'Python dépasse R en biostatistiques médicales',url:'https://www.python.org/',sum:'Pandas et scikit-learn deviennent des avantages compétitifs pour les profils médecin-data.',tag:'Python'},
+  {title:'Blockchain & santé : traçabilité du médicament en Europe',url:'https://www.fun-mooc.fr/',sum:'La directive Falsified Medicines impose des solutions de traçabilité — la blockchain s\'impose comme standard.',tag:'Blockchain'},
+  {title:'Gouvernance des données : rôle du CDO en 2026',url:'https://www.gartner.com/',sum:'Le CDO arbitre entre valeur business, RGPD, éthique et innovation. Profil hybride médecin-data très recherché.',tag:'CDO'},
+];
+function loadNews(){
+  if(newsLoaded)return;newsLoaded=true;
+  document.getElementById('news-out').innerHTML=NEWS.map((n,i)=>`
+    <div class="news-item">
+      <div class="news-num">0${i+1}</div>
+      <div><div class="news-title"><a href="${n.url}" target="_blank">${n.title} ↗</a></div>
+      <div class="news-sum">${n.sum}</div>
+      <div class="news-meta">#${n.tag} · ${new Date().toLocaleDateString('fr-FR')}</div></div>
+    </div>`).join('');
+}
+
+// ══ QUIZ ══
+const QUIZ_BANK=[
+  {q:'En Python, quelle méthode Pandas lit un fichier CSV ?',opts:['A. pd.read_csv()','B. pd.load_csv()','C. pd.open_csv()','D. pd.import_csv()'],c:0,exp:'pd.read_csv() est la fonction standard Pandas. Elle retourne un DataFrame.'},
+  {q:'Que signifie PMSI ?',opts:['A. Programme de Médecine et Soins Intensifs','B. Programme de Médicalisation des Systèmes d\'Information','C. Portail des Médicaments et Services Informatiques','D. Plan de Management des Soins Innovants'],c:1,exp:'Le PMSI code les séjours hospitaliers — base de la tarification à l\'activité (T2A).'},
+  {q:'En SQL, quelle clause filtre après une agrégation ?',opts:['A. WHERE','B. FILTER','C. HAVING','D. SELECT'],c:2,exp:'HAVING filtre après GROUP BY. WHERE filtre avant l\'agrégation.'},
+  {q:'Que impose le RGPD pour les données de santé ?',opts:['A. Suppression après 2 ans','B. Chiffrement uniquement','C. Protection renforcée comme données sensibles (art. 9)','D. Stockage en France uniquement'],c:2,exp:'Les données de santé sont une catégorie spéciale (art. 9) imposant une base légale spécifique.'},
+  {q:'Qu\'est-ce que le SNDS ?',opts:['A. Système Numérique de Diagnostic de Santé','B. Système National des Données de Santé','C. Standard Numérique de Documentation Sanitaire','D. Service National de Distribution des Soins'],c:1,exp:'Le SNDS regroupe les données de remboursements de l\'Assurance Maladie pour toute la population.'},
+  {q:'Qu\'est-ce qu\'un smart contract blockchain ?',opts:['A. Un contrat PDF signé électroniquement','B. Un programme auto-exécuté stocké sur la blockchain','C. Un algorithme de chiffrement','D. Un protocole de communication réseau'],c:1,exp:'Un smart contract est du code qui s\'exécute automatiquement sur la blockchain quand des conditions sont remplies.'},
+  {q:'Quelle est la principale utilité de la blockchain en santé ?',opts:['A. Remplacer les DSI hospitaliers','B. Stocker toutes les données patients','C. Assurer la traçabilité et l\'intégrité des données médicales','D. Accélérer les calculs statistiques'],c:2,exp:'La blockchain garantit l\'immuabilité et la traçabilité : consentement horodaté, chaîne de custody des données d\'essais cliniques, traçabilité médicaments.'},
+];
+async function loadQuiz(force=false){
+  if(quizLoaded&&!force)return;quizLoaded=true;quizAnswered=false;
+  const st=getSt();
+  const topics=allF().filter(f=>(st[f.id]||f.status)!=='fait').map(f=>f.title);
+  const topic=topics.length?topics[Math.floor(Math.random()*Math.min(topics.length,4))]:'données de santé';
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,
+        messages:[{role:'user',content:`QCM en français niveau CDO santé sur : "${topic}". JSON valide uniquement :\n{"q":"...","opts":["A. ...","B. ...","C. ...","D. ..."],"c":0,"exp":"..."}`}]})});
+    const d=await r.json();
+    const raw=d.content?.map(b=>b.text||'').join('').replace(/```json|```/g,'').trim();
+    renderQuiz(JSON.parse(raw));return;
+  }catch(e){}
+  quizIdx=(quizIdx+1)%QUIZ_BANK.length;
+  renderQuiz(QUIZ_BANK[quizIdx]);
+}
+function renderQuiz(q){
+  document.getElementById('quiz-out').innerHTML=`
+    <div class="quiz-wrap">
+      <div class="quiz-q">${q.q||q.question}</div>
+      <div class="quiz-opts">${(q.opts||q.options).map((o,i)=>
+        `<button class="qopt" onclick="answerQuiz(this,${i},${q.c!==undefined?q.c:q.correct},'${((q.exp||q.explanation)||'').replace(/'/g,"&#39;").replace(/\n/g,' ')}')">${o}</button>`
+      ).join('')}</div></div>`;
+}
+function answerQuiz(btn,idx,correct,exp){
+  if(quizAnswered)return;quizAnswered=true;
+  const isRight=idx===correct;
+  btn.closest('.quiz-opts').querySelectorAll('.qopt').forEach((o,i)=>o.classList.add(i===correct?'correct':i===idx&&!isRight?'wrong':''));
+  const e=document.createElement('div');e.className='q-exp';e.textContent='→ '+exp;
+  btn.closest('.quiz-wrap').appendChild(e);
+  quizScore.total++;if(isRight)quizScore.right++;
+  const sc=document.getElementById('quiz-score');sc.style.display='inline-flex';
+  sc.textContent=`Score session : ${quizScore.right} / ${quizScore.total} bonnes réponses`;
+}
+
+// ══ CODE CHALLENGE ══
+const CODE_CH=[
+  {q:'Écrivez une fonction Python qui prend une liste de notes et retourne leur moyenne.',hint:'def moyenne(notes):',check:s=>s.includes('def')&&s.includes('sum')&&s.includes('len'),fb:'✓ Correct ! def moyenne(notes): return sum(notes)/len(notes)'},
+  {q:'Requête SQL : comptez le nombre de patients par service (table: patients, col: service).',hint:'SELECT service, COUNT(*) FROM ...',check:s=>s.toLowerCase().includes('count')&&s.toLowerCase().includes('group by'),fb:'✓ Correct ! SELECT service, COUNT(*) FROM patients GROUP BY service'},
+  {q:'En Python, créez un dictionnaire avec 3 spécialités médicales et leur nombre de praticiens.',hint:"specialites = {'Gériatrie': 45, ...}",check:s=>s.includes('{')&&s.includes(':'),fb:"✓ Bien ! specialites = {'Gériatrie': 45, 'Cardiologie': 120, 'Data': 12}"},
+  {q:'Filtrez en Python une liste de patients et retournez ceux de plus de 65 ans.',hint:'def seniors(patients):',check:s=>s.includes('def')&&(s.includes('65')||s.includes('filter')),fb:'✓ Bien ! def seniors(p): return [x for x in p if x["age"] > 65]'},
+];
+function loadCode(force=false){
+  if(codeLoaded&&!force)return;codeLoaded=true;
+  document.getElementById('code-out').style.display='none';
+  document.getElementById('code-in').value='';
+  codeIdx=(codeIdx+1)%CODE_CH.length;
+  const ch=CODE_CH[codeIdx];
+  document.getElementById('code-q').innerHTML=`<span style="color:var(--text)">${ch.q}</span><br/><code style="font-family:var(--mono);font-size:12px;color:var(--muted)"># Indice : ${ch.hint}</code>`;
+  document.getElementById('code-q').dataset.idx=codeIdx;
+}
+function checkCode(){
+  const code=document.getElementById('code-in').value.trim();
+  const out=document.getElementById('code-out');out.style.display='block';
+  if(!code){out.textContent='⚠ Écrivez du code avant de vérifier.';out.style.color='var(--red)';return;}
+  const idx=parseInt(document.getElementById('code-q').dataset.idx||0);
+  const ch=CODE_CH[idx];
+  if(ch&&ch.check(code)){out.textContent=ch.fb;out.style.color='var(--green)';}
+  else{out.textContent='↻ Pas encore correct. Indice : '+ch.hint;out.style.color='var(--orange)';}
+}
+
+// ══ AI COACH ══
+async function analyzeDay(){
+  const input=document.getElementById('coach-in').value.trim();if(!input)return;
+  const btn=document.getElementById('ana-btn');btn.disabled=true;btn.textContent='Analyse en cours…';
+  document.getElementById('coach-out').innerHTML='<div class="sk"></div><div class="sk s"></div>';
+  const st=getSt();
+  const doing=allF().filter(f=>(st[f.id]||f.status)==='en_cours').map(f=>f.title).join(', ')||'Google Analytics, Stanford Code in Place';
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:900,
+        messages:[{role:'user',content:`Coach CDO brutal. Médecin gériatre → Chief Data Officer santé. En cours : ${doing}. Plan : ${input}.\nJSON valide uniquement :\n{"top3":["...","...","..."],"procrast":"...","schedule":"..."}`}]})});
+    const d=await r.json();
+    const res=JSON.parse(d.content?.map(b=>b.text||'').join('').replace(/```json|```/g,'').trim());
+    document.getElementById('coach-out').innerHTML=`
+      <div class="r-block" style="border-left:3px solid var(--green)"><div class="r-lbl">Top 3 priorités</div><div class="r-txt">${res.top3.map((p,i)=>`${i+1}. ${p}`).join('\n')}</div></div>
+      <div class="r-block" style="border-left:3px solid var(--red)"><div class="r-lbl">Procrastination détectée</div><div class="r-txt">${res.procrast}</div></div>
+      <div class="r-block" style="border-left:3px solid var(--purple)"><div class="r-lbl">Planning optimisé</div><div class="r-txt">${res.schedule}</div></div>`;
+  }catch(e){document.getElementById('coach-out').innerHTML='<div style="color:var(--muted);font-size:14px">Erreur. Réessayez (fonctionne depuis Claude.ai).</div>';}
+  btn.disabled=false;btn.innerHTML='⬡ Analyser & optimiser';
+}
+
+// ══ PROJET HOSPITALIER ══
+function loadProjetData(){
+  const s=G('projet');
+  if(s){
+    document.getElementById('proj-title').value=s.title||'';
+    document.getElementById('proj-notes').value=s.notes||'';
+  }
+  ['proj-title','proj-notes'].forEach(id=>{
+    document.getElementById(id).addEventListener('input',()=>{
+      W('projet',{title:document.getElementById('proj-title').value,notes:document.getElementById('proj-notes').value});
+    });
+  });
+}
+function saveProjet(){
+  W('projet',{title:document.getElementById('proj-title').value,notes:document.getElementById('proj-notes').value});
+  const el=document.getElementById('proj-saved');el.style.display='block';
+  setTimeout(()=>el.style.display='none',2000);
+}
+
+// ══ POST-IT ROSE ══
+function togglePP(){
+  const panel=document.getElementById('pp-panel'),btn=document.getElementById('pp-btn');
+  const open=panel.style.display!=='none'&&panel.style.display!=='';
+  panel.style.display=open?'none':'flex';
+  btn.style.display=open?'block':'none';
+}
+function savePP(){W('pink-notes',document.getElementById('pp-notes').value);}
+function loadPP(){
+  const s=G('pink-notes');
+  if(s)document.getElementById('pp-notes').value=s;
+}
+
+// ══ NAVIGATION ══
+function nav(id){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+  document.getElementById('sec-'+id).classList.add('on');
+  document.querySelectorAll('.sbi,.mob-btn').forEach(b=>b.classList.toggle('active',b.getAttribute('onclick')?.includes(`nav('${id}')`)));
+  if(id==='news')loadNews();
+  if(id==='quiz'){loadQuiz();if(!codeLoaded)loadCode();}
+  if(id==='planning')renderPlanning();
+  if(id==='projet')loadProjetData();
+}
+function later(id){setTimeout(()=>document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'}),100);}
+
+// ══ START ══
+init();
+</script>
+
+</body>
+</html>
